@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/RichardKnop/go-oauth2-server/util/password"
 	"reflect"
 
 	"github.com/RichardKnop/go-oauth2-server/config"
@@ -11,10 +12,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 )
-
-func init() {
-
-}
 
 var (
 	// HealthService ...
@@ -51,13 +48,13 @@ func UseSessionService(s session.ServiceInterface) {
 }
 
 // Init starts up all services
-func Init(cnf *config.Config, db *gorm.DB) error {
+func Init(hasher password.Interface, cnf *config.Config, db *gorm.DB) error {
 	if nil == reflect.TypeOf(HealthService) {
 		HealthService = health.NewService(db)
 	}
 
 	if nil == reflect.TypeOf(OauthService) {
-		OauthService = oauth.NewService(cnf, db)
+		OauthService = oauth.NewService(hasher, cnf, db)
 	}
 
 	if nil == reflect.TypeOf(SessionService) {

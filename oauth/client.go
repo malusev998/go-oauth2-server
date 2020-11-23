@@ -7,18 +7,17 @@ import (
 
 	"github.com/RichardKnop/go-oauth2-server/models"
 	"github.com/RichardKnop/go-oauth2-server/util"
-	"github.com/RichardKnop/go-oauth2-server/util/password"
 	"github.com/RichardKnop/uuid"
 	"github.com/jinzhu/gorm"
 )
 
 var (
 	// ErrClientNotFound ...
-	ErrClientNotFound = errors.New("Client not found")
+	ErrClientNotFound = errors.New("client not found")
 	// ErrInvalidClientSecret ...
-	ErrInvalidClientSecret = errors.New("Invalid client secret")
+	ErrInvalidClientSecret = errors.New("invalid client secret")
 	// ErrClientIDTaken ...
-	ErrClientIDTaken = errors.New("Client ID taken")
+	ErrClientIDTaken = errors.New("client ID taken")
 )
 
 // ClientExists returns true if client exists
@@ -61,7 +60,7 @@ func (s *Service) AuthClient(clientID, secret string) (*models.OauthClient, erro
 	}
 
 	// Verify the secret
-	if password.VerifyPassword(client.Secret, secret) != nil {
+	if s.hasher.Verify([]byte(client.Secret), []byte(secret)) != nil {
 		return nil, ErrInvalidClientSecret
 	}
 
@@ -75,7 +74,7 @@ func (s *Service) createClientCommon(db *gorm.DB, clientID, secret, redirectURI 
 	}
 
 	// Hash password
-	secretHash, err := password.HashPassword(secret)
+	secretHash, err := s.hasher.Hash(secret)
 	if err != nil {
 		return nil, err
 	}

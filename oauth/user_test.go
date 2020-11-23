@@ -180,6 +180,8 @@ func (suite *OauthTestSuite) TestSetPassword() {
 		err  error
 	)
 
+	hasher := pass.NewBcryptHasher(pass.LowBCryptCost)
+
 	// Insert a test user without a password
 	user = &models.OauthUser{
 		MyGormModel: models.MyGormModel{
@@ -209,7 +211,7 @@ func (suite *OauthTestSuite) TestSetPassword() {
 
 	// User object should have been updated
 	assert.Equal(suite.T(), "test@user_nopass", user.Username)
-	assert.Nil(suite.T(), pass.VerifyPassword(user.Password.String, "test_password"))
+	assert.Nil(suite.T(), hasher.Verify([]byte(user.Password.String), []byte("test_password")))
 }
 
 func (suite *OauthTestSuite) TestAuthUser() {

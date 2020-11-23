@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/RichardKnop/go-oauth2-server/util/password"
 	"net/http"
 	"time"
 
@@ -19,8 +20,10 @@ func RunServer(configBackend string) error {
 	}
 	defer db.Close()
 
+	hasher := password.NewBcryptHasher(password.DefaultBcryptCost)
+
 	// start the services
-	if err := services.Init(cnf, db); err != nil {
+	if err := services.Init(hasher, cnf, db); err != nil {
 		return err
 	}
 	defer services.Close()

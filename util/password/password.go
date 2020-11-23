@@ -1,15 +1,12 @@
 package password
 
-import (
-	"golang.org/x/crypto/bcrypt"
+type (
+	BCryptCost uint8
+	Interface  interface {
+		// Verify compares password and the hashed password
+		Verify(passwordHash, password []byte) error
+
+		// Hash creates a password hash
+		Hash(password string) ([]byte, error)
+	}
 )
-
-// VerifyPassword compares password and the hashed password
-func VerifyPassword(passwordHash, password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
-}
-
-// HashPassword creates a bcrypt password hash
-func HashPassword(password string) ([]byte, error) {
-	return bcrypt.GenerateFromPassword([]byte(password), 3)
-}

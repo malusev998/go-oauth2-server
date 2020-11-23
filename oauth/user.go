@@ -8,7 +8,6 @@ import (
 
 	"github.com/RichardKnop/go-oauth2-server/models"
 	"github.com/RichardKnop/go-oauth2-server/util"
-	pass "github.com/RichardKnop/go-oauth2-server/util/password"
 	"github.com/RichardKnop/uuid"
 	"github.com/jinzhu/gorm"
 )
@@ -89,7 +88,7 @@ func (s *Service) AuthUser(username, password string) (*models.OauthUser, error)
 	}
 
 	// Verify the password
-	if pass.VerifyPassword(user.Password.String, password) != nil {
+	if s.hasher.Verify([]byte(user.Password.String), []byte(password)) != nil {
 		return nil, ErrInvalidUserPassword
 	}
 
@@ -127,7 +126,7 @@ func (s *Service) createUserCommon(db *gorm.DB, roleID, username, password strin
 		if len(password) < MinPasswordLength {
 			return nil, ErrPasswordTooShort
 		}
-		passwordHash, err := pass.HashPassword(password)
+		passwordHash, err := s.hasher.Hash(password)
 		if err != nil {
 			return nil, err
 		}
@@ -152,7 +151,7 @@ func (s *Service) setPasswordCommon(db *gorm.DB, user *models.OauthUser, passwor
 	}
 
 	// Create a bcrypt hash
-	passwordHash, err := pass.HashPassword(password)
+	passwordHash, err := s.hasher.Hash(password)
 	if err != nil {
 		return err
 	}

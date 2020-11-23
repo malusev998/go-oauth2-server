@@ -73,7 +73,7 @@ func (b *etcdBackend) LoadConfig() (*Config, error) {
 	// Unmarshal the config JSON into the cnf object
 	newCnf := new(Config)
 
-	if err := json.Unmarshal([]byte(resp.Kvs[0].Value), newCnf); err != nil {
+	if err := json.Unmarshal(resp.Kvs[0].Value, newCnf); err != nil {
 		return nil, err
 	}
 

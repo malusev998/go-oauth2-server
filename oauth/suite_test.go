@@ -1,6 +1,7 @@
 package oauth_test
 
 import (
+	"github.com/RichardKnop/go-oauth2-server/util/password"
 	"os"
 	"testing"
 
@@ -79,7 +80,7 @@ func (suite *OauthTestSuite) SetupSuite() {
 	}
 
 	// Initialise the service
-	suite.service = oauth.NewService(suite.cnf, suite.db)
+	suite.service = oauth.NewService(password.NewBcryptHasher(password.LowBCryptCost),suite.cnf, suite.db)
 
 	// Register routes
 	suite.router = mux.NewRouter()
